@@ -1,0 +1,12 @@
+language: csharp
+solution: EntityFramework.DbDescriptionHelper.sln
+# runtime config
+mono: none
+dotnet: 1.0.4
+dist: trusty
+
+install:
+  - dotnet restore
+  
+script:
+  - dotnet build /p:Configuration=Release --framework:netstandard1.6 ./EntityFramework.DbDescriptionHelper/EntityFramework.DbDescriptionHelper.csproj
