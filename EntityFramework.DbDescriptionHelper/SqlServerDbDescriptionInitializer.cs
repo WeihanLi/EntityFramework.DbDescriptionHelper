@@ -78,7 +78,7 @@ END";
         /// </summary>
         /// <param name="contextType">typeof custom DbContext</param>
         /// <returns>generated db description sql</returns>
-        public string GenerateDbDescriptionSqlText(Type contextType)
+        public virtual string GenerateDbDescriptionSqlText(Type contextType)
         {
             if (contextType == null)
             {
@@ -157,7 +157,7 @@ END";
         /// generate db description
         /// </summary>
         /// <param name="context">database context</param>
-        public void GenerateDbDescription(DbContext context)
+        public virtual void GenerateDbDescription(DbContext context)
         {
             string sqlText = GenerateDbDescriptionSqlText(context.GetType());
             if (sqlText.Length > 0)
@@ -170,7 +170,7 @@ END";
         /// generate db description
         /// </summary>
         /// <param name="context">database context</param>
-        public async Task GenerateDbDescriptionAsync(DbContext context)
+        public virtual async Task GenerateDbDescriptionAsync(DbContext context)
         {
             string sqlText = GenerateDbDescriptionSqlText(context.GetType());
             if (sqlText.Length > 0)
