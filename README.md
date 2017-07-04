@@ -81,8 +81,8 @@ asp.net core project:
 ### Todo
 What will be done in the release V1.0
 
-- [ ] GetTableName automatically
-- [ ] Mysql database description initlizer
+- [ ] Get table name automatically
+- [ ] Get column name automatically
 
 ### Contact
 
