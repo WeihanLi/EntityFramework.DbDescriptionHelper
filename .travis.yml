@@ -2,11 +2,12 @@ language: csharp
 solution: EntityFramework.DbDescriptionHelper.sln
 # runtime config
 mono: none
-dotnet: 1.0.4
+dotnet: 2.0.0
 dist: trusty
 
 install:
+  - dotnet --info
   - dotnet restore
   
 script:
-  - dotnet build /p:Configuration=Release --framework:netstandard1.6 ./EntityFramework.DbDescriptionHelper/EntityFramework.DbDescriptionHelper.csproj
+  - dotnet build /p:Configuration=Release --framework:netstandard2.0 ./EntityFramework.DbDescriptionHelper/EntityFramework.DbDescriptionHelper.csproj
