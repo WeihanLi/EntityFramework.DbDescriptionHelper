@@ -2,6 +2,7 @@
 using System.Data.Entity;
 #else
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 #endif
 
 using System;
@@ -10,8 +11,10 @@ using System.Text;
 using System.Linq;
 using System.Threading.Tasks;
 
+
 namespace EntityFramework.DbDescriptionHelper
 {
+    /// <inheritdoc />
     /// <summary>
     /// SqlServerDbDescriptionInitializer
     /// </summary>
@@ -73,6 +76,7 @@ ELSE
         EXECUTE sp_addextendedproperty N'MS_Description', N'{2}', N'SCHEMA', N'dbo',  N'TABLE', N'{0}', N'COLUMN', N'{1}';
 END";
 
+        /// <inheritdoc />
         /// <summary>
         /// GenerateDbDescriptionSqlText
         /// </summary>
@@ -101,9 +105,9 @@ END";
            p.PropertyType.GetTypeInfo().IsGenericType &&
            p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>)).Select(p => p.PropertyType.GetTypeInfo().GenericTypeArguments.FirstOrDefault());
 #endif
-            if (types != null && types.Any())
+            if (types.Any())
             {
-                StringBuilder sbSqlDescText = new StringBuilder();
+                var sbSqlDescText = new StringBuilder();
                 foreach (var type in types)
                 {
 #if NET45
@@ -153,6 +157,7 @@ END";
             return "";
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// generate db description
         /// </summary>
@@ -166,6 +171,7 @@ END";
             }
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// generate db description
         /// </summary>
@@ -179,4 +185,18 @@ END";
             }
         }
     }
+#if !NET45
+    public static class EntityFrameworkCoreExtensions
+    {
+        public static int ExecuteSqlCommand(this DatabaseFacade database, string sql,params object[] parameters)
+        {
+            return database.ExecuteSqlCommand(new RawSqlString(sql),parameters);
+        }
+
+        public static async Task<int> ExecuteSqlCommandAsync(this DatabaseFacade database, string sql, params object[] parameters)
+        {
+            return await database.ExecuteSqlCommandAsync(new RawSqlString(sql), parameters);
+        }
+    }
+#endif
 }

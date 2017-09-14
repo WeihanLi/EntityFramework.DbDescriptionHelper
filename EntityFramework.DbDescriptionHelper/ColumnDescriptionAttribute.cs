@@ -2,12 +2,14 @@
 
 namespace EntityFramework.DbDescriptionHelper
 {
+    /// <inheritdoc />
     /// <summary>
     /// ColumnDescription
     /// </summary>
     [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = false)]
     public class ColumnDescriptionAttribute : Attribute
     {
+        /// <inheritdoc />
         /// <summary>
         /// ColumnDescription
         /// </summary>
@@ -17,6 +19,7 @@ namespace EntityFramework.DbDescriptionHelper
             Description = description;
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// ColumnDescription
         /// </summary>
