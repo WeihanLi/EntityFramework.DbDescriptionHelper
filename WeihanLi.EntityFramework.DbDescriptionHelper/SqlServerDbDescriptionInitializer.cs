@@ -12,7 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 
-namespace EntityFramework.DbDescriptionHelper
+namespace WeihanLi.EntityFramework.DbDescriptionHelper
 {
     /// <inheritdoc />
     /// <summary>

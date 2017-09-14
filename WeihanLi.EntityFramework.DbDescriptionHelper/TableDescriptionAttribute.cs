@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EntityFramework.DbDescriptionHelper
+namespace WeihanLi.EntityFramework.DbDescriptionHelper
 {
     /// <summary>
     /// TableDescription

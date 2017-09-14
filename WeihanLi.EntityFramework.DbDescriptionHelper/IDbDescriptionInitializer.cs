@@ -6,7 +6,7 @@ using System.Data.Entity;
 using Microsoft.EntityFrameworkCore;
 #endif
 
-namespace EntityFramework.DbDescriptionHelper
+namespace WeihanLi.EntityFramework.DbDescriptionHelper
 {
     /// <summary>
     /// IDbDescriptionInitializer
