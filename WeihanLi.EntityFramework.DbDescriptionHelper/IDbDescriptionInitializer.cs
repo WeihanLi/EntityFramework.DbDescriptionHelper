@@ -16,9 +16,9 @@ namespace WeihanLi.EntityFramework.DbDescriptionHelper
         /// <summary>
         /// GenerateDbDescriptionSqlText
         /// </summary>
-        /// <param name="contextType">typeof custom DbContext</param>
+        /// <param name="context">database context</param>
         /// <returns>generated db description sql</returns>
-        string GenerateDbDescriptionSqlText(Type contextType);
+        string GenerateDbDescriptionSqlText(DbContext context);
 
         /// <summary>
         /// generate db description

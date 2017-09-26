@@ -80,51 +80,38 @@ END";
         /// <summary>
         /// GenerateDbDescriptionSqlText
         /// </summary>
-        /// <param name="contextType">typeof custom DbContext</param>
+        /// <param name="context">DbContext</param>
         /// <returns>generated db description sql</returns>
-        public virtual string GenerateDbDescriptionSqlText(Type contextType)
+        public virtual string GenerateDbDescriptionSqlText(DbContext context)
         {
+            Type contextType = context.GetType();
             if (contextType == null)
             {
                 throw new ArgumentNullException(nameof(contextType), "contextType can not be null.");
             }
-#if NET45
             if (!(typeof(DbContext)).IsAssignableFrom(contextType))
-#else
-            if (!(typeof(DbContext)).GetTypeInfo().IsAssignableFrom(contextType.GetTypeInfo()))
-#endif
             {
                 throw new ArgumentException("contextType should extends from DbContext.", nameof(contextType));
             }
-#if NET45
             var types = contextType.GetRuntimeProperties().Where(p =>
            p.PropertyType.IsGenericType &&
            p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>)).Select(p => p.PropertyType.GetGenericArguments().FirstOrDefault());
-#else
-            var types = contextType.GetRuntimeProperties().Where(p =>
-           p.PropertyType.GetTypeInfo().IsGenericType &&
-           p.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>)).Select(p => p.PropertyType.GetTypeInfo().GenericTypeArguments.FirstOrDefault());
-#endif
             if (types.Any())
             {
                 var sbSqlDescText = new StringBuilder();
                 foreach (var type in types)
                 {
-#if NET45
                     var attribute = type.GetCustomAttribute(typeof(TableDescriptionAttribute)) as TableDescriptionAttribute;
-#else
-                    var attribute = type.GetTypeInfo().GetCustomAttribute(typeof(TableDescriptionAttribute)) as TableDescriptionAttribute;
-#endif
-                    string tableName = "", tableDesc = "";
-                    if (attribute != null)
-                    {
-                        tableName = attribute.Name;
-                        tableDesc = attribute.Description;
-                    }
+
+                    string tableName = attribute?.Name, tableDesc = attribute?.Description;
+#if NET45
                     if (String.IsNullOrEmpty(tableName))
                     {
                         tableName = type.Name;
                     }
+#else
+                    tableName = context.Model.FindEntityType(type).Relational().TableName;
+#endif
                     if (!String.IsNullOrEmpty(tableDesc))
                     {
                         //生成表描述sql
@@ -138,14 +125,19 @@ END";
                         if (columnAttribute != null)
                         {
                             string columnName = columnAttribute.Name, columnDesc = columnAttribute.Description;
+
                             if (String.IsNullOrEmpty(columnDesc))
                             {
                                 continue;
                             }
+#if NET45                            
                             if (String.IsNullOrEmpty(columnName))
                             {
                                 columnName = property.Name;
                             }
+#else
+                            columnName = context.Model.FindEntityType(type).FindProperty(property.Name).Relational().ColumnName;
+#endif
                             // 生成字段描述
                             sbSqlDescText.AppendFormat(columnDescFormat, tableName, columnName, columnDesc);
                             sbSqlDescText.AppendLine();
@@ -164,7 +156,7 @@ END";
         /// <param name="context">database context</param>
         public virtual void GenerateDbDescription(DbContext context)
         {
-            string sqlText = GenerateDbDescriptionSqlText(context.GetType());
+            string sqlText = GenerateDbDescriptionSqlText(context);
             if (sqlText.Length > 0)
             {
                 context.Database.ExecuteSqlCommand(sqlText);
@@ -178,25 +170,33 @@ END";
         /// <param name="context">database context</param>
         public virtual async Task GenerateDbDescriptionAsync(DbContext context)
         {
-            string sqlText = GenerateDbDescriptionSqlText(context.GetType());
+            string sqlText = GenerateDbDescriptionSqlText(context);
             if (sqlText.Length > 0)
             {
                 await context.Database.ExecuteSqlCommandAsync(sqlText);
             }
         }
     }
-#if !NET45
-    public static class EntityFrameworkCoreExtensions
+
+#if NET45
+    public static class EntityFrameworkExtensions
     {
-        public static int ExecuteSqlCommand(this DatabaseFacade database, string sql,params object[] parameters)
+    }
+
+#else
+    public static class DotNetCoreExtensions
+    {
+        #region EntityFrameworkExtensions
+        public static int ExecuteSqlCommand(this DatabaseFacade database, string sql, params object[] parameters)
         {
-            return database.ExecuteSqlCommand(new RawSqlString(sql),parameters);
+            return database.ExecuteSqlCommand(new RawSqlString(sql), parameters);
         }
 
         public static async Task<int> ExecuteSqlCommandAsync(this DatabaseFacade database, string sql, params object[] parameters)
         {
             return await database.ExecuteSqlCommandAsync(new RawSqlString(sql), parameters);
         }
+        #endregion
     }
 #endif
 }
